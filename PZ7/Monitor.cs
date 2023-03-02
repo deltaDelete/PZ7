@@ -9,7 +9,11 @@ public class Monitor : IObserver<LuggageInfo> {
     private string _name;
     private List<string> _flightInfos = new List<string>();
     private IDisposable _cancellation;
-    private string _format = "{0,-20} {1,5}  {2, 3}";
+    private string _format = "{0,-20}\t{1,5}\t{2, 3}";
+
+    public event EventHandler<List<string>> OnUpdateStatus;
+
+    public string Name { get => _name; }
 
     public Monitor(string name) {
         if (String.IsNullOrEmpty(name))
@@ -62,11 +66,16 @@ public class Monitor : IObserver<LuggageInfo> {
         }
         if (updated) {
             _flightInfos.Sort();
-            Console.WriteLine("Информация о прибытии из {0}", this._name);
-            foreach (var flightInfo in _flightInfos)
-                Console.WriteLine(flightInfo);
+            //Console.WriteLine("Информация о прибытии из {0}", this._name);
+            //foreach (var flightInfo in _flightInfos)
+            //    Console.WriteLine(flightInfo);
 
-            Console.WriteLine();
+            //Console.WriteLine();
+            RaiseUpdateStatus(_flightInfos);
         }
+    }
+
+    private void RaiseUpdateStatus(List<string> e) {
+        OnUpdateStatus?.Invoke(this, e);
     }
 }
