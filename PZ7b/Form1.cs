@@ -23,7 +23,7 @@ public partial class Form1 : Form {
         InitializeComponent();
 
         errorInfos.CollectionChanged += (sender, e) => {
-            dataGridView1.DataSource = errorInfos;
+            dataGridView1.DataSource = errorInfos.ToList();
         };
 
         dataGridView1.DataSource = errorInfos;
@@ -33,16 +33,24 @@ public partial class Form1 : Form {
 
         monitor.Subscribe(errorHandler);
         monitor.OnUpdateStatus += (sender, e) => {
-            e.ForEach(i => errorInfos.Add(i));
+            errorInfos.Add(e);
         };
     }
 
     private void button1_Click(object sender, EventArgs e) {
         var code = rnd.Next(0, 700);
-        var rndRangeStart = rnd.Next(0, randomBullshit.Count());
-        var rndRangeEnd = rnd.Next(rndRangeStart, randomBullshit.Count());
-        var rndMessage = string.Join(' ', randomBullshit.Where(i => randomBullshit.IndexOf(i) == rnd.Next(0, randomBullshit.Count())));
-        var rndLocation = string.Join(' ', randomBullshit.Where(i => randomBullshit.IndexOf(i) == rnd.Next(0, randomBullshit.Count())));
+        var rndRangeStart = () => rnd.Next(0, randomBullshit.Count());
+        var rndRangeEnd = () => rnd.Next(rndRangeStart(), randomBullshit.Count());
+        var rndMessage = string.Join(' ', randomBullshit.Where(i => {
+            var index = randomBullshit.IndexOf(i);
+            return index >= rndRangeStart() && index < rndRangeEnd();
+        }
+    ));
+        var rndLocation = string.Join(' ', randomBullshit.Where(i => {
+            var index = randomBullshit.IndexOf(i);
+            return index >= rndRangeStart() && index < rndRangeEnd();
+        }
+    ));
         errorHandler.ErrorStatus(code, rndMessage, rndLocation);
     }
 }

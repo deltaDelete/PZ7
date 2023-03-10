@@ -10,7 +10,7 @@ public class ErrorMonitor : IObserver<ErrorInfo> {
     private List<ErrorInfo> _errorInfos = new List<ErrorInfo>();
     private IDisposable _cancellation;
 
-    public event EventHandler<List<ErrorInfo>> OnUpdateStatus;
+    public event EventHandler<ErrorInfo> OnUpdateStatus;
 
     public ErrorMonitor() {
     }
@@ -33,11 +33,11 @@ public class ErrorMonitor : IObserver<ErrorInfo> {
     }
 
     public virtual void OnNext(ErrorInfo info) {
-        _errorInfos.Sort();
-        RaiseUpdateStatus(_errorInfos);
+        _errorInfos.Add(info);
+        RaiseUpdateStatus(info);
     }
 
-    private void RaiseUpdateStatus(List<ErrorInfo> e) {
+    private void RaiseUpdateStatus(ErrorInfo e) {
         OnUpdateStatus?.Invoke(this, e);
     }
 }
